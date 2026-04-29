@@ -187,7 +187,7 @@ export default function MyProfilePage() {
         }
 
         try {
-          const profile = await pb.collection('candidate_profiles').getFirstListItem(
+          const profile = await pb.collection('candidates').getFirstListItem(
             `user = "${currentUser.id}"`
           );
           
@@ -278,14 +278,14 @@ export default function MyProfilePage() {
 
             if (profile.resume) {
               setResumeUrl(
-                `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidate_profiles/${profile.id}/${profile.resume}`
+                `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidates/${profile.id}/${profile.resume}`
               );
               setResumeFileName(profile.resume);
             }
 
             if (profile.headshot) {
               setHeadshotUrl(
-                `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidate_profiles/${profile.id}/${profile.headshot}`
+                `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidates/${profile.id}/${profile.headshot}`
               );
             }
 
@@ -502,19 +502,19 @@ export default function MyProfilePage() {
 
       let record;
       if (profileId) {
-        record = await pb.collection('candidate_profiles').update(profileId, formData);
+        record = await pb.collection('candidates').update(profileId, formData);
       } else {
-        record = await pb.collection('candidate_profiles').create(formData);
+        record = await pb.collection('candidates').create(formData);
         setProfileId(record.id);
       }
 
       if (record.resume) {
-        setResumeUrl(`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidate_profiles/${record.id}/${record.resume}`);
+        setResumeUrl(`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidates/${record.id}/${record.resume}`);
         setResumeFileName(record.resume);
       }
 
       if (record.headshot) {
-        setHeadshotUrl(`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidate_profiles/${record.id}/${record.headshot}?t=${Date.now()}`);
+        setHeadshotUrl(`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidates/${record.id}/${record.headshot}?t=${Date.now()}`);
       }
 
       if (record.resume_generated) {
@@ -601,9 +601,18 @@ export default function MyProfilePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-brand-dark">My Profile</h1>
-          <p className="text-gray-500 mt-1 text-sm sm:text-base">Manage your professional information and resume.</p>
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 mb-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <p className="text-xs font-bold tracking-[0.25em] text-brand-green uppercase">Profile</p>
+              <h1 className="text-3xl sm:text-4xl font-bold text-brand-dark mt-2">My Profile</h1>
+              <p className="text-gray-500 mt-2 text-sm sm:text-base">Manage your professional information and resume.</p>
+            </div>
+            <div className="bg-brand-green/10 border border-brand-green/20 rounded-2xl px-6 py-5 min-w-[220px]">
+              <p className="text-xs font-bold tracking-[0.2em] text-brand-green uppercase">Completion</p>
+              <p className="text-4xl font-bold text-brand-dark mt-1">{completeness}%</p>
+            </div>
+          </div>
         </div>
 
         {/* Profile Completeness */}

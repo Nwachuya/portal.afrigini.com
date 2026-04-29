@@ -74,7 +74,7 @@ export default function MyApplicationsPage() {
           constraints.push(`stage = "${filterStage}"`);
         }
 
-        const result = await pb.collection('job_applications').getList(page, PER_PAGE, {
+        const result = await pb.collection('applications').getList(page, PER_PAGE, {
           filter: constraints.join(' && '),
           sort: '-created', // Sort by Apply Date (Newest First)
           requestKey: null,
@@ -145,10 +145,17 @@ export default function MyApplicationsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-brand-dark">My Applications</h1>
-          <p className="text-gray-500 mt-1">Track and manage your job applications.</p>
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <p className="text-xs font-bold tracking-[0.25em] text-brand-green uppercase">Applications</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-brand-dark mt-2">My Applications</h1>
+            <p className="text-gray-500 mt-2 text-sm sm:text-base">Track and manage your job applications.</p>
+          </div>
+          <div className="bg-brand-green/10 border border-brand-green/20 rounded-2xl px-6 py-5 min-w-[220px]">
+            <p className="text-xs font-bold tracking-[0.2em] text-brand-green uppercase">Total Found</p>
+            <p className="text-4xl font-bold text-brand-dark mt-1">{totalItems}</p>
+          </div>
         </div>
       </div>
 
@@ -218,7 +225,7 @@ export default function MyApplicationsPage() {
                 const orgName = org?.name || 'Confidential Company';
                 
                 const logoUrl = org?.logo 
-                  ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/organizations/${org.id}/${org.logo}`
+                  ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/orgs/${org.id}/${org.logo}`
                   : null;
                 
                 return (

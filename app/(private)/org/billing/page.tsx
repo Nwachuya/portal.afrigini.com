@@ -26,6 +26,11 @@ interface Payment {
   payer_email: string;
 }
 
+type OrgAdminRecord = {
+  id: string;
+  job_credit?: number;
+};
+
 type BannerState = {
   text: string;
   type: '' | 'success' | 'error' | 'info';
@@ -165,22 +170,30 @@ function BillingContent() {
       let resolvedOrgName = 'Organization';
       let resolvedCredits = 0;
       const expandedOrg = memberRes.expand?.organization as
-        | { id?: string; name?: string; job_credits?: number }
+        | { id?: string; name?: string }
         | undefined;
 
-      if (expandedOrg?.name || typeof expandedOrg?.job_credits === 'number') {
+      if (expandedOrg?.name) {
         resolvedOrgName = expandedOrg?.name || resolvedOrgName;
-        resolvedCredits = expandedOrg?.job_credits || 0;
       } else {
         try {
-          const organization = await pb.collection('organizations').getOne(organizationId, {
+          const organization = await pb.collection('orgs').getOne(organizationId, {
             requestKey: null,
           });
           resolvedOrgName = organization.name || resolvedOrgName;
-          resolvedCredits = organization.job_credits || 0;
         } catch (error) {
           console.error('Error loading organization details for billing:', error);
         }
+      }
+
+      try {
+        const orgAdmin = await pb.collection('org_admin').getFirstListItem<OrgAdminRecord>(
+          `org = "${organizationId}"`,
+          { requestKey: null }
+        );
+        resolvedCredits = orgAdmin?.job_credit || 0;
+      } catch (error) {
+        console.error('Error loading organization credit details for billing:', error);
       }
 
       setOrgName(resolvedOrgName);

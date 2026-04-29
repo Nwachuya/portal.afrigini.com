@@ -54,9 +54,6 @@ export interface CandidateProfileRecord extends BaseRecord {
 
 export interface OrganizationRecord extends BaseRecord {
   name?: string;
-  is_personal?: boolean;
-  tier?: string;
-  job_credits?: number;
   about?: string;
   website?: string;
   logo?: string;
@@ -64,7 +61,14 @@ export interface OrganizationRecord extends BaseRecord {
   location?: string;
   linkedin_url?: string;
   size?: string;
-  stripe_customer_id?: string;
+}
+
+export interface OrgAdminRecord extends BaseRecord {
+  org: string;
+  stripe_cus_id?: string;
+  is_personal?: boolean;
+  tier?: number;
+  job_credit?: number;
 }
 
 export interface JobRecord extends BaseRecord {

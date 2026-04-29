@@ -34,7 +34,7 @@ const EMPTY_FORM: OrganizationForm = {
 
 function getOrganizationLogoUrl(orgId: string, logo?: string) {
   if (!logo) return null;
-  return `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/organizations/${orgId}/${logo}`;
+  return `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/orgs/${orgId}/${logo}`;
 }
 
 export default function OrganizationSettingsPage() {
@@ -79,7 +79,7 @@ export default function OrganizationSettingsPage() {
 
         let organization = memberRes.expand?.organization as OrganizationRecord | undefined;
         if (!organization?.id) {
-          organization = await pb.collection('organizations').getOne<OrganizationRecord>(organizationId, {
+          organization = await pb.collection('orgs').getOne<OrganizationRecord>(organizationId, {
             requestKey: null,
           });
         }
@@ -192,7 +192,7 @@ export default function OrganizationSettingsPage() {
         formData.append('logo', fileInputRef.current.files[0]);
       }
 
-      const updatedOrg = await pb.collection('organizations').update<OrganizationRecord>(orgId, formData);
+      const updatedOrg = await pb.collection('orgs').update<OrganizationRecord>(orgId, formData);
       const nextForm: OrganizationForm = {
         about: updatedOrg.about || '',
         industry: updatedOrg.industry || '',

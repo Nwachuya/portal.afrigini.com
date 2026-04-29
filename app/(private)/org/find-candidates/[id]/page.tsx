@@ -114,7 +114,7 @@ export default function CandidateDetailPage() {
         setOrgId(memberRes.organization);
 
         const [candidateRes, jobsRes] = await Promise.all([
-          pb.collection('candidate_profiles').getOne(candidateId, {
+          pb.collection('candidates').getOne(candidateId, {
             requestKey: null,
           }),
           canInviteCandidates(memberRes.role)
@@ -163,12 +163,12 @@ export default function CandidateDetailPage() {
       setCheckingEligibility(true);
       try {
         const [existingApps, existingInvites] = await Promise.all([
-          pb.collection('job_applications').getFullList({
+          pb.collection('applications').getFullList({
             filter: `applicant = "${escapeFilterValue(candidate.user)}"`,
             fields: 'job',
             requestKey: null,
           }),
-          pb.collection('job_invitations').getFullList({
+          pb.collection('job_invites').getFullList({
             filter: `candidate_profile = "${escapeFilterValue(candidate.id)}"`,
             fields: 'job',
             requestKey: null,
@@ -213,10 +213,10 @@ export default function CandidateDetailPage() {
     setInviteError('');
 
     try {
-      await pb.collection('job_invitations').create({
+      await pb.collection('job_invites').create({
         organization: orgId,
         job: selectedJobId,
-        candidate_profile: candidate.id,
+        profile: candidate.id,
         message: inviteMessage || `We think you'd be a great fit for this role!`,
         status: 'pending',
       });

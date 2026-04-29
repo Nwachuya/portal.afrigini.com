@@ -75,7 +75,7 @@ export default function NewJobPage() {
             let orgRecord = membership.expand?.organization as OrganizationRecord | undefined;
             if (!orgRecord) {
               try {
-                orgRecord = await pb.collection('organizations').getOne(membership.organization, {
+                orgRecord = await pb.collection('orgs').getOne(membership.organization, {
                   requestKey: null,
                 }) as unknown as OrganizationRecord;
               } catch (orgError) {
@@ -85,7 +85,21 @@ export default function NewJobPage() {
 
             if (orgRecord) {
               setOrgName(orgRecord.name || 'Your Organization');
-              setCredits(orgRecord.job_credits || 0);
+            }
+
+            try {
+              const orgAdmin = await pb.collection('org_admin').getFirstListItem<{ job_credit?: number }>(
+                `org = "${membership.organization}"`,
+                { requestKey: null }
+              );
+              if (isMounted) {
+                setCredits(orgAdmin?.job_credit || 0);
+              }
+            } catch (creditsError) {
+              console.error('Failed to load organization credits', creditsError);
+              if (isMounted) {
+                setCredits(0);
+              }
             }
           } else {
             setDebugError('Membership found, but not linked to a valid organization.');

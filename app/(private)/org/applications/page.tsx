@@ -155,7 +155,7 @@ export default function ApplicationsPage() {
           const roleJobIds = roleJobs.map((job: any) => job.id);
           const roleJobFilter = buildIdEqualsFilter('job', roleJobIds);
 
-          const matchedProfiles = await pb.collection('candidate_profiles').getFullList({
+          const matchedProfiles = await pb.collection('candidates').getFullList({
             filter: `firstName ~ "${escapedQuery}" || lastName ~ "${escapedQuery}" || headline ~ "${escapedQuery}"`,
             fields: 'user',
             requestKey: null,
@@ -177,7 +177,7 @@ export default function ApplicationsPage() {
           applicationConstraints.push(`(${searchBranches.join(' || ')})`);
         }
 
-        const result = await pb.collection('job_applications').getList(page, PER_PAGE, {
+        const result = await pb.collection('applications').getList(page, PER_PAGE, {
           filter: applicationConstraints.join(' && '),
           sort: sortBy,
           requestKey: null,

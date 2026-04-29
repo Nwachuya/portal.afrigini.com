@@ -37,14 +37,16 @@ export default function TopBar({
 
         {/* Center: Logo */}
         <Link href={dashboardHref}>
-          <Image
-            src="/afrigini_logo.png"
-            alt="Afrigini Logo"
-            width={120}
-            height={32}
-            className="object-contain h-8 w-auto"
-            priority
-          />
+          <div className="relative h-8 w-[120px]">
+            <Image
+              src="/afrigini_logo.png"
+              alt="Afrigini Logo"
+              fill
+              sizes="120px"
+              className="object-contain"
+              priority
+            />
+          </div>
         </Link>
 
         {/* Right: Avatar */}

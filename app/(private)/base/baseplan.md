@@ -15,7 +15,7 @@ It is not for normal org workflows.
 ### Phase 1 (MVP)
 - `/base/dashboard`
 - `/base/users`
-- `/base/organizations`
+- `/base/orgs`
 - `/base/audit-log`
 
 ### Phase 2

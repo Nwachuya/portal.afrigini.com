@@ -55,7 +55,7 @@ export async function fetchCandidateProfilesByUserIds(
     return new Map();
   }
 
-  const profiles = await pb.collection('candidate_profiles').getFullList<CandidateProfileRecord>({
+  const profiles = await pb.collection('candidates').getFullList<CandidateProfileRecord>({
     filter: `(${buildOrFilter('user', normalizedUserIds)})`,
     requestKey: null,
   });
@@ -76,15 +76,15 @@ export async function hydrateJobs<T extends JobRecord>(jobs: T[]): Promise<T[]> 
     return department ? [department] : [];
   };
 
-  let organizationsById = new Map<string, OrganizationRecord>();
+  let orgsById = new Map<string, OrganizationRecord>();
   try {
-    const organizations = await fetchByIds<OrganizationRecord>(
-      'organizations',
+    const orgs = await fetchByIds<OrganizationRecord>(
+      'orgs',
       jobs.map((job) => job.organization)
     );
-    organizationsById = new Map(organizations.map((organization) => [organization.id, organization]));
+    orgsById = new Map(orgs.map((organization) => [organization.id, organization]));
   } catch {
-    // Candidate-facing pages can't read organizations with the current schema.
+    // Candidate-facing pages can't read orgs with the current schema.
   }
 
   const departments = await fetchByIds<DepartmentRecord>(
@@ -98,7 +98,7 @@ export async function hydrateJobs<T extends JobRecord>(jobs: T[]): Promise<T[]> 
     ...job,
       expand: {
         ...job.expand,
-        organization: organizationsById.get(job.organization),
+        organization: orgsById.get(job.organization),
         department: getDepartmentIds(job.department)
           .map((departmentId) => departmentsById.get(departmentId))
           .filter((department): department is DepartmentRecord => Boolean(department)),
@@ -144,15 +144,15 @@ export async function hydrateJobInvitations<T extends JobInvitationRecord>(invit
   const hydratedJobs = await hydrateJobs(jobs);
   const jobsById = new Map(hydratedJobs.map((job) => [job.id, job]));
 
-  let organizationsById = new Map<string, OrganizationRecord>();
+  let orgsById = new Map<string, OrganizationRecord>();
   try {
-    const organizations = await fetchByIds<OrganizationRecord>(
-      'organizations',
+    const orgs = await fetchByIds<OrganizationRecord>(
+      'orgs',
       invitations.map((invitation) => invitation.organization)
     );
-    organizationsById = new Map(organizations.map((organization) => [organization.id, organization]));
+    orgsById = new Map(orgs.map((organization) => [organization.id, organization]));
   } catch {
-    // Candidate-facing pages can't read organizations with the current schema.
+    // Candidate-facing pages can't read orgs with the current schema.
   }
 
   return invitations.map((invitation) => ({
@@ -161,7 +161,7 @@ export async function hydrateJobInvitations<T extends JobInvitationRecord>(invit
       ...invitation.expand,
       job: invitation.job ? jobsById.get(invitation.job) : undefined,
       organization: invitation.organization
-        ? organizationsById.get(invitation.organization)
+        ? orgsById.get(invitation.organization)
         : undefined,
     },
   }));

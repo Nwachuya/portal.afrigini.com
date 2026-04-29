@@ -1,9 +1,6 @@
 import Link from 'next/link';
 import type { CandidateProfileRecord } from '@/types';
-import {
-  formatDisplayDate,
-  getCandidateInitials,
-} from '@/lib/candidate-resume';
+import { getCandidateInitials } from '@/lib/candidate-resume';
 
 export default function CandidateHero({
   profile,
@@ -33,21 +30,6 @@ export default function CandidateHero({
               <p className="mt-2 text-base text-gray-600 sm:text-lg">
                 {profile.headline || 'Add a headline in your profile to define your professional positioning.'}
               </p>
-
-              <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-gray-600">
-                <span className="rounded-full bg-brand-green/10 px-3 py-1 text-brand-green">
-                  {profile.is_open_to_work ? 'Open to work' : 'Not actively looking'}
-                </span>
-                <span className="rounded-full bg-gray-100 px-3 py-1">
-                  {profile.country || 'Location not specified'}
-                </span>
-                {profile.level && (
-                  <span className="rounded-full bg-gray-100 px-3 py-1">{profile.level}</span>
-                )}
-                <span className="rounded-full bg-gray-100 px-3 py-1">
-                  Updated {formatDisplayDate(profile.updated)}
-                </span>
-              </div>
             </div>
           </div>
 

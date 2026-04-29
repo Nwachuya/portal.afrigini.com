@@ -58,13 +58,13 @@ export default function JobDetailsPage() {
         // 2. Check User Status
         if (currentUser) {
           try {
-            const profileRes = await pb.collection('candidate_profiles').getFirstListItem(
+            const profileRes = await pb.collection('candidates').getFirstListItem(
               `user = "${currentUser.id}"`
             );
             setProfile(profileRes as unknown as CandidateProfileRecord);
 
             if (profileRes) {
-              const applications = await pb.collection('job_applications').getList(1, 1, {
+              const applications = await pb.collection('applications').getList(1, 1, {
                 filter: `job = "${id}" && applicant = "${currentUser.id}"`,
                 requestKey: null,
               });
@@ -144,7 +144,7 @@ export default function JobDetailsPage() {
         if (!profile.resume_generated_pdf) {
           throw new Error("Generated resume PDF is not available yet.");
         }
-        const pdfUrl = `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidate_profiles/${profile.id}/${profile.resume_generated_pdf}`;
+        const pdfUrl = `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidates/${profile.id}/${profile.resume_generated_pdf}`;
         const pdfResponse = await fetch(pdfUrl);
         if (!pdfResponse.ok) {
           throw new Error("Failed to fetch generated resume PDF.");
@@ -177,7 +177,7 @@ export default function JobDetailsPage() {
         formData.append('answer_five', answerFive);
       }
 
-      await pb.collection('job_applications').create(formData);
+      await pb.collection('applications').create(formData);
       
       setHasApplied(true);
       setShowModal(false);
@@ -204,7 +204,7 @@ export default function JobDetailsPage() {
   const org = job.expand?.organization;
   const orgName = org?.name || 'Confidential Company';
   const logoUrl = org?.logo 
-    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/organizations/${org.id}/${org.logo}`
+    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/orgs/${org.id}/${org.logo}`
     : null;
   const descriptionText = htmlToPlainText(job.description);
   const benefitsText = htmlToPlainText(job.benefits);
@@ -358,7 +358,7 @@ export default function JobDetailsPage() {
                         </span>
                         {profile?.resume_generated_pdf && (
                           <a
-                            href={`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidate_profiles/${profile.id}/${profile.resume_generated_pdf}`}
+                            href={`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidates/${profile.id}/${profile.resume_generated_pdf}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:underline text-xs"

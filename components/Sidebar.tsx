@@ -53,30 +53,20 @@ export default function Sidebar({ user, userRole, orgMembershipRole, isOpen, onT
         <div className={`h-16 flex items-center border-b border-gray-200 ${isOpen ? 'justify-between px-3' : 'justify-center gap-1 px-1'}`}>
           {isOpen ? (
             <>
-              <Image
-                src="/afrigini_logo.png"
-                alt="Afrigini Logo"
-                width={120}
-                height={32}
-                className="object-contain h-8 w-auto"
-                priority
-              />
-              <button
-                onClick={onToggle}
-                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-              >
-                <PanelLeftClose size={18} />
-              </button>
+              <div className="relative h-8 w-[120px]">
+                <Image
+                  src="/afrigini_logo.png"
+                  alt="Afrigini Logo"
+                  fill
+                  sizes="120px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </>
           ) : (
             <>
               <span className="text-xl font-bold text-brand-green">A</span>
-              <button
-                onClick={onToggle}
-                className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-              >
-                <PanelLeft size={18} />
-              </button>
             </>
           )}
         </div>
@@ -160,13 +150,17 @@ export default function Sidebar({ user, userRole, orgMembershipRole, isOpen, onT
         </div>
       </aside>
 
-      {/* Edge toggle area - Desktop only */}
-      <div
+      {/* Boundary toggle - Desktop only */}
+      <button
+        type="button"
         onClick={onToggle}
-        className={`hidden md:block fixed top-0 h-full w-1 cursor-ew-resize hover:bg-brand-green/20 transition-colors z-50 ${
+        aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+        className={`hidden md:flex fixed top-8 -translate-y-1/2 -translate-x-1/2 h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm hover:text-gray-700 hover:border-gray-300 transition-all z-50 ${
           isOpen ? 'left-60' : 'left-16'
         }`}
-      />
+      >
+        {isOpen ? <PanelLeftClose size={16} /> : <PanelLeft size={16} />}
+      </button>
     </>
   );
 }

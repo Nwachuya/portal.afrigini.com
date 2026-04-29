@@ -99,7 +99,7 @@ export default function ApplicationReviewPage() {
         setUser(currentUser);
 
         // 1. Fetch Application Details (Job expanded)
-        const appRes = await pb.collection('job_applications').getOne(appId, {
+        const appRes = await pb.collection('applications').getOne(appId, {
           requestKey: null,
         });
         const [hydratedApplication] = await hydrateApplications([appRes as unknown as JobApplicationRecord]);
@@ -107,7 +107,7 @@ export default function ApplicationReviewPage() {
 
         // 2. Fetch Video
         try {
-          const videoRes = await pb.collection('video_submissions').getList(1, 1, {
+          const videoRes = await pb.collection('videos').getList(1, 1, {
             filter: `application = "${appId}"`,
           });
           if (videoRes.items.length > 0) {
@@ -130,7 +130,7 @@ export default function ApplicationReviewPage() {
 
   const fetchComments = async () => {
     try {
-      const res = await pb.collection('application_comments').getList(1, 100, {
+      const res = await pb.collection('comments').getList(1, 100, {
         filter: `application = "${appId}"`,
         sort: '-created',
         requestKey: null,
@@ -143,7 +143,7 @@ export default function ApplicationReviewPage() {
     if (!app) return;
     setUpdatingStatus(true);
     try {
-      await pb.collection('job_applications').update(appId, { stage: newStage });
+      await pb.collection('applications').update(appId, { stage: newStage });
       setApp({ ...app, stage: newStage });
     } catch (err) { alert("Failed to update status"); } 
     finally { setUpdatingStatus(false); }
@@ -155,7 +155,7 @@ export default function ApplicationReviewPage() {
 
     setSubmittingComment(true);
     try {
-      await pb.collection('application_comments').create({
+      await pb.collection('comments').create({
         application: appId,
         author: user.id,
         message: newComment,
@@ -180,14 +180,14 @@ export default function ApplicationReviewPage() {
   else if (typeof applicant?.skills === 'string') skillsList = (applicant.skills as string).split(',');
 
   const resumeUrl = app.resume_file 
-    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/job_applications/${app.id}/${app.resume_file}`
+    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/applications/${app.id}/${app.resume_file}`
     : null;
   const coverLetterText = htmlToPlainText(app.cover_letter);
   const jobDescriptionText = htmlToPlainText(app.expand?.job?.description);
   const jobBenefitsText = htmlToPlainText(app.expand?.job?.benefits);
 
   const videoFileUrl = video?.video_file 
-    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/video_submissions/${video.id}/${video.video_file}`
+    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/videos/${video.id}/${video.video_file}`
     : null;
 
   return (

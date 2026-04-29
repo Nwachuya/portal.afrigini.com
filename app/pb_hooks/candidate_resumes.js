@@ -244,5 +244,5 @@ async function generateAndSaveResume(e) {
   await e.dao.saveRecord(record);
 }
 
-onRecordAfterCreateRequest((e) => generateAndSaveResume(e), 'candidate_profiles');
-onRecordAfterUpdateRequest((e) => generateAndSaveResume(e), 'candidate_profiles');
+onRecordAfterCreateRequest((e) => generateAndSaveResume(e), 'candidates');
+onRecordAfterUpdateRequest((e) => generateAndSaveResume(e), 'candidates');

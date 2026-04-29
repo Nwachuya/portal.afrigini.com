@@ -7,6 +7,7 @@ import { getDefaultDashboardPath } from '@/lib/access';
 import type { CandidateProfileRecord, DepartmentRecord, UserRecord } from '@/types';
 import CandidateHero from '@/components/candidates/resume/CandidateHero';
 import CandidateSummary from '@/components/candidates/resume/CandidateSummary';
+import CandidateLinksIcons from '@/components/candidates/resume/CandidateLinksIcons';
 import CandidateSkillsPanel from '@/components/candidates/resume/CandidateSkillsPanel';
 import CandidateExperienceList from '@/components/candidates/resume/CandidateExperienceList';
 import CandidateEducationList from '@/components/candidates/resume/CandidateEducationList';
@@ -53,7 +54,7 @@ export default function CandidateResumePage() {
         }
 
         try {
-          const candidateProfile = await pb.collection('candidate_profiles').getFirstListItem(
+          const candidateProfile = await pb.collection('candidates').getFirstListItem(
             `user = "${currentUser.id}"`
           );
 
@@ -176,8 +177,8 @@ export default function CandidateResumePage() {
       <div className="space-y-6">
         <CandidateHero profile={profile} fullName={fullName} headshotUrl={headshotUrl} />
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="space-y-6">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
+          <div className="min-w-0 space-y-6">
             <CandidateSummary profile={profile} preferences={preferences} />
             <CandidateExperienceList items={workExperience} />
             <div className="grid gap-6 xl:grid-cols-2">
@@ -186,7 +187,8 @@ export default function CandidateResumePage() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
+            <CandidateLinksIcons profile={profile} />
             <CandidateSkillsPanel skills={skills} languages={languages} />
             <CandidateResumeAssets
               uploadedResumeUrl={uploadedResumeUrl}

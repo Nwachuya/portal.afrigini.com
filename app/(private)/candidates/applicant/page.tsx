@@ -8,6 +8,11 @@ import Link from 'next/link';
 import { getApplicantProfileBanner } from '@/lib/candidate-profile';
 import { hydrateJobs } from '@/lib/pb-hydration';
 
+function isAutoCancelledError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || '');
+  return message.toLowerCase().includes('autocancelled');
+}
+
 export default function ApplicantDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<UserRecord | null>(null);
@@ -24,7 +29,9 @@ export default function ApplicantDashboard() {
           return;
         }
 
-        const freshUser = await pb.collection('users').getOne(pb.authStore.model!.id);
+        const freshUser = await pb.collection('users').getOne(pb.authStore.model!.id, {
+          requestKey: null,
+        });
         const userRecord = freshUser as unknown as UserRecord;
         
         // SECURITY CHECK: Redirect if not an Applicant
@@ -38,11 +45,12 @@ export default function ApplicantDashboard() {
         // ... (Rest of the logic remains the same) ...
         let candidateProfile: CandidateProfileRecord | null = null;
         try {
-          candidateProfile = await pb.collection('candidate_profiles').getFirstListItem(
+          candidateProfile = await pb.collection('candidates').getFirstListItem(
             `user = "${freshUser.id}"`, { requestKey: null }
           ) as unknown as CandidateProfileRecord;
           setProfile(candidateProfile);
-        } catch(e) {
+        } catch (e) {
+          if (isAutoCancelledError(e)) return;
           console.log("No profile record found.");
         }
 
@@ -53,12 +61,12 @@ export default function ApplicantDashboard() {
           const [
             appliedRes, interviewRes, acceptedRes, videoRes, invitesRes, allApplicationsRes,
           ] = await Promise.all([
-            pb.collection('job_applications').getList(1, 1, { filter, requestKey: null }),
-            pb.collection('job_applications').getList(1, 1, { filter: `${filter} && (stage = "Interview" || stage = "Invited")`, requestKey: null }),
-            pb.collection('job_applications').getList(1, 1, { filter: `${filter} && stage = "Accepted"`, requestKey: null }),
-            pb.collection('job_applications').getList(1, 1, { filter: `${filter} && stage = "Send Video"`, requestKey: null }),
-            pb.collection('job_invitations').getList(1, 1, { filter: `candidate_profile = "${profileId}" && status = "pending"`, requestKey: null }),
-            pb.collection('job_applications').getFullList({ filter, requestKey: null }),
+            pb.collection('applications').getList(1, 1, { filter, requestKey: null }),
+            pb.collection('applications').getList(1, 1, { filter: `${filter} && (stage = "Interview" || stage = "Invited")`, requestKey: null }),
+            pb.collection('applications').getList(1, 1, { filter: `${filter} && stage = "Accepted"`, requestKey: null }),
+            pb.collection('applications').getList(1, 1, { filter: `${filter} && stage = "Send Video"`, requestKey: null }),
+            pb.collection('job_invites').getList(1, 1, { filter: `candidate_profile = "${profileId}" && status = "pending"`, requestKey: null }),
+            pb.collection('applications').getFullList({ filter, requestKey: null }),
           ]);
 
           setStats({
@@ -91,6 +99,7 @@ export default function ApplicantDashboard() {
           }
         }
       } catch (e) {
+        if (isAutoCancelledError(e)) return;
         console.error("Error fetching dashboard data:", e);
       } finally {
         setLoading(false);
@@ -103,25 +112,15 @@ export default function ApplicantDashboard() {
   if (loading) return <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-500">Loading dashboard...</div>;
   if (!user) return null; // Will redirect
 
-  const avatarUrl = user.avatar 
-    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/users/${user.id}/${user.avatar}` 
-    : null;
-    
   const profileBanner = getApplicantProfileBanner(profile);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
       {/* Header */}
-      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-6">
-        <div className="h-20 w-20 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-3xl font-bold text-blue-600">{user.email?.[0].toUpperCase()}</span>
-          )}
-        </div>
+      <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-gray-100">
         <div>
+          <p className="text-xs font-bold tracking-[0.2em] uppercase text-brand-green">Welcome</p>
           <h1 className="text-3xl font-bold text-gray-900">Hello, {user.name || 'Applicant'}!</h1>
           <p className="text-gray-500 mt-1">Welcome back. Let's find your next opportunity.</p>
         </div>

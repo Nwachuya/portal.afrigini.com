@@ -1,5 +1,6 @@
 # Next.js
 .next/
+.next*/
 out/
 
 # Node.js
@@ -17,9 +18,18 @@ yarn-error.log*
 
 # IDEs and other tools
 .vscode/
+.idea/
 .DS_Store
 *.log
 *.log.*
+.eslintcache
+.turbo/
+.vercel/
+.swc/
+.cache/
+.tmp/
+.temp/
+.pnpm-debug.log*
 .env
 .env.*
 
@@ -28,3 +38,6 @@ pb_data/
 pb_migrations/
 *.db
 *.pem
+
+# TypeScript
+*.tsbuildinfo

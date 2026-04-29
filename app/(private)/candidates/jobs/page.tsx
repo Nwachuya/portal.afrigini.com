@@ -42,13 +42,13 @@ export default function JobsPage() {
           if (currentUser.role === 'Applicant') {
             try {
               // Get Profile
-              const profile = await pb.collection('candidate_profiles').getFirstListItem(
+              const profile = await pb.collection('candidates').getFirstListItem(
                 `user = "${currentUser.id}"`, 
                 { requestKey: null }
               );
               
               // Get All Applications for this profile (just the job IDs)
-              const apps = await pb.collection('job_applications').getFullList({
+              const apps = await pb.collection('applications').getFullList({
                 filter: `applicant = "${currentUser.id}"`,
                 fields: 'job', // Optimization: only fetch job ID
                 requestKey: null
@@ -266,7 +266,7 @@ export default function JobsPage() {
                   const org = job.expand?.organization;
                   const orgName = org?.name || 'Confidential Company';
                   const logoUrl = org?.logo 
-                    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/organizations/${org.id}/${org.logo}`
+                    ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/orgs/${org.id}/${org.logo}`
                     : null;
                   
                   const isApplied = appliedJobIds.includes(job.id);

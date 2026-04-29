@@ -1,9 +1,0 @@
-{
-  "/icon/[[...__metadata_id__]]/route": "app/icon/[[...__metadata_id__]]/route.js",
-  "/_not-found/page": "app/_not-found/page.js",
-  "/(private)/candidates/applicant/page": "app/(private)/candidates/applicant/page.js",
-  "/(private)/candidates/jobs/page": "app/(private)/candidates/jobs/page.js",
-  "/(private)/candidates/my-applications/page": "app/(private)/candidates/my-applications/page.js",
-  "/(private)/candidates/my-profile/page": "app/(private)/candidates/my-profile/page.js",
-  "/(private)/candidates/account-settings/page": "app/(private)/candidates/account-settings/page.js"
-}

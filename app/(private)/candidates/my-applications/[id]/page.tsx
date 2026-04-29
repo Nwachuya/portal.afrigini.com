@@ -82,7 +82,7 @@ export default function ApplicationDetailPage() {
         if (!applicationId) { router.push('/candidates/my-applications'); return; }
 
         // 1. Fetch Application
-        const result = await pb.collection('job_applications').getOne(applicationId, {
+        const result = await pb.collection('applications').getOne(applicationId, {
           requestKey: null
         });
 
@@ -95,7 +95,7 @@ export default function ApplicationDetailPage() {
 
         // 2. Fetch Video
         try {
-          const videoRes = await pb.collection('video_submissions').getList(1, 1, {
+          const videoRes = await pb.collection('videos').getList(1, 1, {
             filter: `application = "${applicationId}"`,
             requestKey: null
           });
@@ -259,14 +259,14 @@ export default function ApplicationDetailPage() {
         setUploadProgress(prev => Math.min(prev + 10, 90));
       }, 500);
 
-      const result = await pb.collection('video_submissions').create(formData);
+      const result = await pb.collection('videos').create(formData);
       clearInterval(progressInterval);
       setUploadProgress(100);
 
       setVideoSubmission(result as unknown as VideoSubmission);
       setSuccess('Video submitted successfully! Your application is now under review.');
 
-      const updatedApp = await pb.collection('job_applications').getOne(applicationId, {
+      const updatedApp = await pb.collection('applications').getOne(applicationId, {
         requestKey: null,
       });
       const [hydratedApplication] = await hydrateApplications([updatedApp as unknown as JobApplicationRecord]);
@@ -329,8 +329,8 @@ export default function ApplicationDetailPage() {
   const benefitsText = htmlToPlainText(job?.benefits);
   const coverLetterText = htmlToPlainText(application.cover_letter);
 
-  const logoUrl = org?.logo ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/organizations/${org.id}/${org.logo}` : null;
-  const videoFileUrl = videoSubmission?.video_file ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/video_submissions/${videoSubmission.id}/${videoSubmission.video_file}` : null;
+  const logoUrl = org?.logo ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/orgs/${org.id}/${org.logo}` : null;
+  const videoFileUrl = videoSubmission?.video_file ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/videos/${videoSubmission.id}/${videoSubmission.video_file}` : null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -531,7 +531,7 @@ export default function ApplicationDetailPage() {
               {application.resume_file && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Resume</h3>
-                  <a href={`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/job_applications/${application.id}/${application.resume_file}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                  <a href={`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/applications/${application.id}/${application.resume_file}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>View Resume
                   </a>
                 </div>
@@ -539,7 +539,7 @@ export default function ApplicationDetailPage() {
               {application.cover_letter_file && (
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 mb-2">Cover Letter File</h3>
-                  <a href={`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/job_applications/${application.id}/${application.cover_letter_file}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+                  <a href={`${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/applications/${application.id}/${application.cover_letter_file}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>View Cover Letter
                   </a>
                 </div>

@@ -1,4 +1,5 @@
 import type { CandidateProfileRecord } from '@/types';
+import { formatDisplayDate } from '@/lib/candidate-resume';
 
 export default function CandidateSummary({
   profile,
@@ -16,55 +17,34 @@ export default function CandidateSummary({
         </div>
       </div>
 
-      <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="rounded-2xl border border-gray-100 bg-gray-50/70 p-5">
-          <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
+      <div className="mt-5 space-y-5">
+        <div className="min-w-0 rounded-2xl border border-gray-100 bg-gray-50/70 p-5">
+          <p className="whitespace-pre-wrap break-words text-sm leading-7 text-gray-700">
             {profile.bio || 'Add a bio in your profile so recruiters can quickly understand your background and strengths.'}
           </p>
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-gray-100 bg-white p-4">
-            <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-gray-500">Links</h3>
-            <div className="mt-3 space-y-3 text-sm">
-              {profile.linkedin ? (
-                <a
-                  href={profile.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block rounded-xl border border-brand-green/20 px-4 py-3 transition-colors hover:bg-green-50"
-                >
-                  <p className="font-semibold text-brand-green">LinkedIn</p>
-                  <p className="mt-1 truncate text-xs text-gray-500">{profile.linkedin}</p>
-                </a>
-              ) : (
-                <div className="rounded-xl border border-gray-200 px-4 py-3 text-gray-400">
-                  <p className="font-semibold">LinkedIn</p>
-                  <p className="mt-1 text-xs">Not provided</p>
-                </div>
+          <div className="rounded-2xl border border-gray-100 bg-white p-5">
+            <h3 className="text-sm font-semibold text-gray-600">Profile Snapshot</h3>
+            <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-gray-600">
+              <span className="rounded-full bg-brand-green/10 px-3 py-1 text-brand-green">
+                {profile.is_open_to_work ? 'Open to work' : 'Not actively looking'}
+              </span>
+              <span className="rounded-full bg-gray-100 px-3 py-1">
+                {profile.country || 'Location not specified'}
+              </span>
+              {profile.level && (
+                <span className="rounded-full bg-gray-100 px-3 py-1">{profile.level}</span>
               )}
-
-              {profile.portfolio ? (
-                <a
-                  href={profile.portfolio}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block rounded-xl border border-brand-green/20 px-4 py-3 transition-colors hover:bg-green-50"
-                >
-                  <p className="font-semibold text-brand-green">Portfolio</p>
-                  <p className="mt-1 truncate text-xs text-gray-500">{profile.portfolio}</p>
-                </a>
-              ) : (
-                <div className="rounded-xl border border-gray-200 px-4 py-3 text-gray-400">
-                  <p className="font-semibold">Portfolio</p>
-                  <p className="mt-1 text-xs">Not provided</p>
-                </div>
-              )}
+              <span className="rounded-full bg-gray-100 px-3 py-1">
+                Updated {formatDisplayDate(profile.updated)}
+              </span>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-gray-100 bg-white p-4">
-            <h3 className="text-sm font-bold uppercase tracking-[0.14em] text-gray-500">Department Preferences</h3>
+          <div className="rounded-2xl border border-gray-100 bg-white p-5">
+            <h3 className="text-sm font-semibold text-gray-600">Department Preferences</h3>
             {preferences.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {preferences.map((item) => (
@@ -78,6 +58,7 @@ export default function CandidateSummary({
             )}
           </div>
         </div>
+
       </div>
     </section>
   );

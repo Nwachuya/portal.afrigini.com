@@ -92,7 +92,7 @@ export function getCandidateProfileFileUrl(
     return null;
   }
 
-  return `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidate_profiles/${profile.id}/${fileName}`;
+  return `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/candidates/${profile.id}/${fileName}`;
 }
 
 export function formatDisplayDate(value?: string | null): string {

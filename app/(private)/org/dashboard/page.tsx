@@ -64,7 +64,7 @@ export default function OrganizationDashboard() {
             resolvedOrgName = expandedOrg.name;
           } else {
             try {
-              const org = await pb.collection('organizations').getOne(id, {
+              const org = await pb.collection('orgs').getOne(id, {
                 requestKey: null,
               });
               resolvedOrgName = org.name || resolvedOrgName;
@@ -91,7 +91,7 @@ export default function OrganizationDashboard() {
           const jobFilter = buildIdEqualsFilter('job', orgJobs.map((job: any) => job.id));
 
           const orgApplications = jobFilter
-            ? await pb.collection('job_applications').getFullList({
+            ? await pb.collection('applications').getFullList({
                 filter: jobFilter,
                 sort: '-created',
                 requestKey: null,

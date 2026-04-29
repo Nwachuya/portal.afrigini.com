@@ -1,7 +1,7 @@
 import PocketBase from 'pocketbase';
 import { clearServerSession, syncServerSession } from './session-client';
 
-const PB_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090';
+const PB_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'https://pb.afrigini.com';
 
 const pb = new PocketBase(PB_URL);
 

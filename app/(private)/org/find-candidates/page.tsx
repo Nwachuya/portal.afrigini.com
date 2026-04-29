@@ -194,7 +194,7 @@ export default function FindCandidatesPage() {
     const fetchCandidates = async () => {
       setLoading(true);
       try {
-        const result = await pb.collection('candidate_profiles').getList(page, PER_PAGE, {
+        const result = await pb.collection('candidates').getList(page, PER_PAGE, {
           filter: buildCandidateFilter({
             searchTerm,
             locationFilter,
@@ -257,13 +257,13 @@ export default function FindCandidatesPage() {
       setEligibleJobs([]);
 
       try {
-        const existingApps = await pb.collection('job_applications').getFullList({
+        const existingApps = await pb.collection('applications').getFullList({
           filter: `applicant = "${escapeFilterValue(selectedCandidate.user)}"`,
           fields: 'job',
           requestKey: null,
         });
 
-        const existingInvites = await pb.collection('job_invitations').getFullList({
+        const existingInvites = await pb.collection('job_invites').getFullList({
           filter: `candidate_profile = "${escapeFilterValue(selectedCandidate.id)}"`,
           fields: 'job',
           requestKey: null,
@@ -314,10 +314,10 @@ export default function FindCandidatesPage() {
     setInviteError(null);
 
     try {
-      await pb.collection('job_invitations').create({
+      await pb.collection('job_invites').create({
         organization: orgId,
         job: selectedJobId,
-        candidate_profile: selectedCandidate.id,
+        profile: selectedCandidate.id,
         message: inviteMessage || `We think you'd be a great fit for this role!`,
         status: 'pending',
       });

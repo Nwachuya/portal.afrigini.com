@@ -43,7 +43,7 @@ export default function MyInvitesPage() {
 
         let candidateProfile = null;
         try {
-          candidateProfile = await pb.collection('candidate_profiles').getFirstListItem(
+          candidateProfile = await pb.collection('candidates').getFirstListItem(
             `user = "${user.id}"`
           );
           setProfile(candidateProfile as unknown as CandidateProfileRecord);
@@ -54,7 +54,7 @@ export default function MyInvitesPage() {
         }
 
         // Fetch all invitations linked to this profile
-        const result = await pb.collection('job_invitations').getFullList({
+        const result = await pb.collection('job_invites').getFullList({
           filter: `candidate_profile = "${candidateProfile.id}"`,
           sort: '-created',
           requestKey: null,
@@ -98,7 +98,7 @@ export default function MyInvitesPage() {
               const orgName = org?.name || 'Confidential Company';
               
               const logoUrl = org?.logo 
-                  ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/organizations/${org.id}/${org.logo}`
+                  ? `${process.env.NEXT_PUBLIC_POCKETBASE_URL}/api/files/orgs/${org.id}/${org.logo}`
                 : null;
               
               return (

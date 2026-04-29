@@ -4,14 +4,21 @@ import PocketBase from 'pocketbase';
 import { APP_SESSION_COOKIE, PB_TOKEN_COOKIE, verifySessionToken } from '@/lib/session';
 import { canAccessBilling } from '@/lib/access';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-01-28.clover',
-});
-
 const PB_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'https://pb.afrigini.com';
 
 export async function POST(request: NextRequest) {
   try {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        { error: 'Stripe is not configured' },
+        { status: 500 }
+      );
+    }
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2026-01-28.clover',
+    });
+
     const sessionCookie = request.cookies.get(APP_SESSION_COOKIE)?.value;
     const sessionData = sessionCookie ? await verifySessionToken(sessionCookie) : null;
     const cookiePbToken = request.cookies.get(PB_TOKEN_COOKIE)?.value;
@@ -83,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     let org;
     try {
-      org = await pb.collection('organizations').getOne(orgId);
+      org = await pb.collection('orgs').getOne(orgId);
     } catch (err) {
       return NextResponse.json(
         { error: 'Organization not found' },
@@ -91,7 +98,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let customerId = org.stripe_customer_id;
+    let customerId = '';
+
+    let orgAdminRecord: { id: string; stripe_cus_id?: string } | null = null;
+    try {
+      orgAdminRecord = await pb.collection('org_admin').getFirstListItem(
+        `org = "${orgId}"`,
+        { requestKey: null }
+      );
+      customerId = orgAdminRecord?.stripe_cus_id || '';
+    } catch {
+      orgAdminRecord = null;
+    }
 
     if (!customerId) {
       const customer = await stripe.customers.create({
@@ -104,9 +122,19 @@ export async function POST(request: NextRequest) {
 
       customerId = customer.id;
 
-      await pb.collection('organizations').update(orgId, {
-        stripe_customer_id: customerId,
-      });
+      if (orgAdminRecord?.id) {
+        await pb.collection('org_admin').update(orgAdminRecord.id, {
+          stripe_cus_id: customerId,
+        });
+      } else {
+        await pb.collection('org_admin').create({
+          org: orgId,
+          stripe_cus_id: customerId,
+          is_personal: false,
+          tier: 1,
+          job_credit: 0,
+        });
+      }
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({

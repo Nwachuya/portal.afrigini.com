@@ -9,13 +9,13 @@ export default function Navbar() {
       <div className="w-full px-6 lg:px-12 h-20 flex justify-between items-center">
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative h-10 w-auto">
+          <div className="relative h-10 w-[150px]">
             <Image
               src="/afrigini_logo.png"
               alt="Afrigini Logo"
-              width={150}
-              height={40}
-              className="object-contain h-10 w-auto"
+              fill
+              sizes="150px"
+              className="object-contain"
               priority
             />
           </div>
