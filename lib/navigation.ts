@@ -29,17 +29,23 @@ export interface AppNavItem {
 
 export function getNavItems(
   userRole?: UserRole | null,
-  orgMembershipRole?: string | null
+  orgMembershipRole?: string | null,
+  candidatePaymentsEligible?: boolean
 ): AppNavItem[] {
   if (isApplicantRole(userRole)) {
-    return [
+    const items: AppNavItem[] = [
       { label: 'Dashboard', href: '/candidates/applicant', icon: 'dashboard' },
       { label: 'Jobs', href: '/candidates/jobs', icon: 'briefcase' },
       { label: 'My Applications', href: '/candidates/my-applications', icon: 'fileText' },
       { label: 'My Profile', href: '/candidates/my-profile', icon: 'user' },
-      { label: 'Resume', href: '/candidates/resume', icon: 'fileText' },
-      { label: 'Settings', href: '/candidates/settings', icon: 'settings' },
+      { label: 'My Placements', href: '/candidates/placements', icon: 'briefcase' },
+      { label: 'Payments', href: '/candidates/payments', icon: 'creditCard' },
     ];
+    items.push(
+      { label: 'Resume', href: '/candidates/resume', icon: 'fileText' },
+      { label: 'Settings', href: '/candidates/settings', icon: 'settings' }
+    );
+    return items;
   }
 
   const items: AppNavItem[] = [

@@ -34,13 +34,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserRecord | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [orgMembershipRole, setOrgMembershipRole] = useState<string | null>(null);
+  const [candidatePaymentsEligible, setCandidatePaymentsEligible] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const authRequestIdRef = useRef(0);
   const isLoggingOutRef = useRef(false);
-  const links = getNavItems(userRole, orgMembershipRole);
+  const links = getNavItems(userRole, orgMembershipRole, candidatePaymentsEligible);
 
   const isActive = (href: string) => {
     if (href === pathname) return true;
@@ -101,7 +102,24 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           return;
         }
         setOrgMembershipRole(membership?.role ?? null);
+        setCandidatePaymentsEligible(false);
         return;
+      }
+
+      if (currentUser && currentUserRole === 'Applicant') {
+        try {
+          const response = await fetch('/api/candidates/payments?view=eligibility', { credentials: 'include' });
+          const payload = await response.json();
+          if (isLoggingOutRef.current || requestId !== authRequestIdRef.current) {
+            return;
+          }
+          setCandidatePaymentsEligible(Boolean(payload?.context?.eligible));
+        } catch {
+          if (isLoggingOutRef.current || requestId !== authRequestIdRef.current) {
+            return;
+          }
+          setCandidatePaymentsEligible(false);
+        }
       }
 
       if (requestId !== authRequestIdRef.current) {
@@ -131,6 +149,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     setUser(null);
     setUserRole(null);
     setOrgMembershipRole(null);
+    setCandidatePaymentsEligible(false);
     setMobileMenuOpen(false);
     document.body.style.overflow = '';
 
@@ -193,6 +212,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         user={authenticatedUser}
         userRole={authenticatedUserRole}
         orgMembershipRole={orgMembershipRole}
+        candidatePaymentsEligible={candidatePaymentsEligible}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onLogout={handleLogout}

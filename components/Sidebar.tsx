@@ -24,14 +24,15 @@ interface SidebarProps {
   user: UserRecord;
   userRole: UserRole;
   orgMembershipRole?: string | null;
+  candidatePaymentsEligible?: boolean;
   isOpen: boolean;
   onToggle: () => void;
   onLogout: () => void | Promise<void>;
 }
 
-export default function Sidebar({ user, userRole, orgMembershipRole, isOpen, onToggle, onLogout }: SidebarProps) {
+export default function Sidebar({ user, userRole, orgMembershipRole, candidatePaymentsEligible, isOpen, onToggle, onLogout }: SidebarProps) {
   const pathname = usePathname();
-  const links = getNavItems(userRole, orgMembershipRole);
+  const links = getNavItems(userRole, orgMembershipRole, candidatePaymentsEligible);
 
   const isActive = (href: string) => {
     if (href === pathname) return true;

@@ -24,6 +24,8 @@ interface Payment {
   invoice_url: string;
   created: string;
   payer_email: string;
+  payment_method?: 'stripe' | 'stablecoin';
+  tx_hash?: string;
 }
 
 type OrgAdminRecord = {
@@ -507,16 +509,20 @@ function BillingContent() {
                       <thead className="border-b border-brand-green/10 bg-brand-green/5 text-left text-sm text-gray-500">
                         <tr>
                           <th className="px-4 py-3 font-medium">Date</th>
+                          <th className="px-4 py-3 font-medium">Method</th>
                           <th className="px-4 py-3 font-medium">Amount</th>
                           <th className="px-4 py-3 font-medium">Status</th>
                           <th className="px-4 py-3 font-medium">Payer</th>
-                          <th className="px-4 py-3 text-right font-medium">Receipt</th>
+                          <th className="px-4 py-3 text-right font-medium">Receipt/Link</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-brand-green/10">
                         {payments.map((payment) => (
                           <tr key={payment.id} className="hover:bg-brand-green/5 transition-colors">
                             <td className="px-4 py-4 text-sm text-brand-dark">{formatDate(payment.created)}</td>
+                            <td className="px-4 py-4 text-sm capitalize text-gray-500">
+                              {payment.payment_method || 'stripe'}
+                            </td>
                             <td className="px-4 py-4 text-sm font-medium text-brand-dark">
                               {formatCurrency(payment.amount)}
                             </td>
@@ -525,7 +531,16 @@ function BillingContent() {
                             </td>
                             <td className="px-4 py-4 text-sm text-gray-500">{payment.payer_email || '—'}</td>
                             <td className="px-4 py-4 text-right">
-                              {payment.invoice_url ? (
+                              {payment.payment_method === 'stablecoin' && payment.tx_hash ? (
+                                <a
+                                  href={`https://basescan.org/tx/${payment.tx_hash}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm font-medium text-brand-green hover:text-green-800"
+                                >
+                                  View Tx
+                                </a>
+                              ) : payment.invoice_url ? (
                                 <button
                                   onClick={() => setInvoiceUrl(payment.invoice_url)}
                                   className="text-sm font-medium text-brand-green hover:text-green-800"
@@ -558,9 +573,29 @@ function BillingContent() {
                           <PaymentStatus status={payment.status} />
                         </div>
                         <p className="mt-3 text-sm text-gray-500">
-                          {payment.payer_email || 'No payer email recorded'}
+                          {payment.payment_method === 'stablecoin' ? (
+                            <span className="flex items-center gap-2">
+                              <span className="font-medium text-brand-dark">Stablecoin</span>
+                              {payment.tx_hash && (
+                                <span className="text-xs font-mono text-gray-400">
+                                  ({payment.tx_hash.slice(0, 6)}...{payment.tx_hash.slice(-4)})
+                                </span>
+                              )}
+                            </span>
+                          ) : (
+                            payment.payer_email || 'No payer email recorded'
+                          )}
                         </p>
-                        {payment.invoice_url && (
+                        {payment.payment_method === 'stablecoin' && payment.tx_hash ? (
+                          <a
+                            href={`https://basescan.org/tx/${payment.tx_hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-4 inline-block text-sm font-medium text-brand-green hover:text-green-800"
+                          >
+                            View Transaction
+                          </a>
+                        ) : payment.invoice_url && (
                           <button
                             onClick={() => setInvoiceUrl(payment.invoice_url)}
                             className="mt-4 text-sm font-medium text-brand-green hover:text-green-800"
